@@ -1,4 +1,16 @@
 {
-  "name": "helloworld",
-  "main": "index.html"
+  "main": "index.html",
+  "name": "GenesysPackager",
+  "description": "Packages cooked assets for the Genesys Platform",
+  "version": "1.0",
+  "window": {
+    "title": "Genesys Packager",
+    "toolbar": false,
+    "frame": true,
+    "width": 800,
+    "height": 500
+  },
+  "webkit": {
+    "plugin": true
+  }
 }
