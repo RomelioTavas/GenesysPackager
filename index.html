@@ -1,101 +1,130 @@
 <html>
 <head>
   <script src='./js/vendor/jquery-2.2.0.min.js'></script>
+  <link rel="stylesheet" href="css/foundation.css" />
+  <link rel="stylesheet" href="css/app.css" />
 </head>
 <body>
-<h1>Genesys Packager</h1>
-<h3>Name your package</h3>
-<input type="text" id="PakFileName"/>
-<h3>Select your Unreal Engine Binaries Directory</h3>
-<p id="CurrBinDir">Current Bin Directory: </p>
-<input type="file" id="UEBinDir" nwdirectory/>
-<h3>Select all your cooked uassets</h3>
-<input type="file" id="CookedAssets" multiple />
-<h3>Select all materials for uassets</h3>
-<input type="file" id="CookedMaterials" multiple />
-<p></p>
-<h3>Package!</h3>
-<input type="button" id="Package" value="Package"/>
 
-<script>
+  <div class="top-bar">
+        <div class="top-bar-left">
+          <ul class="dropdown menu" data-dropdown-menu>
+            <li class="menu-text">Genesys-Packager</li>
+          </ul>
+        </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class = "small-12  columns">
+      <h4>Name your package</h4>
+      <input type="text" id="PakFileName" placeholder="Name your package"/>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class ="small-12 columns">
+      <h4>Select your Unreal Engine Binaries Directory</h4>
+      <p id="CurrBinDir">Current Bin Directory: </p>
+      <input type="file" id="UEBinDir" nwdirectory/>
+    </div>
+  </div>
+
+  <div>
+    <div>
+      <h3>Select all your cooked uassets</h3>
+      <input type="file" id="CookedAssets" multiple />
+    </div>
+  </div>
+
+  <h3>Select all materials for uassets</h3>
+  <input type="file" id="CookedMaterials" multiple />
+  <p></p>
+
+  <h3>Package!</h3>
+  <input type="button" id="Package" value="Package"/>
+
+  <script src="js/vendor/jquery.min.js"></script>
+  <script src="js/vendor/what-input.min.js"></script>
+  <script src="js/foundation.min.js"></script>
+  <script>
 
 
-$(document).ready(function () {
-  $("#CurrBinDir").append(localStorage.UEBinDir);
-  $("#UEBinDir")[0].nwworkingdir = localStorage.UEBinDir;
+  $(document).ready(function () {
+    $("#CurrBinDir").append(localStorage.UEBinDir);
+    $("#UEBinDir")[0].nwworkingdir = localStorage.UEBinDir;
 
-  $("#UEBinDir").on("change",function(){
-    localStorage.UEBinDir = this.value;
-  });
+    $("#UEBinDir").on("change",function(){
+      localStorage.UEBinDir = this.value;
+    });
 
-  $("#Package").on("click",function(){
+    $("#Package").on("click",function(){
 
-    //Validate input
-    if($('#PakFileName').val() == ""){
-      return alert("You must name your package");
-    }
-    if($('#CookedAssets')[0].files.length == 0){
-      return alert("You must select at least one cooked asset");
-    }
-
-    var fs = require('fs');
-    //Create temporary file to hold UnrealPak args
-    fs.open('./tmp/pakArgs.txt','w',function(err,fd){
-      if(err){
-        return alert(err);
+      //Validate input
+      if($('#PakFileName').val() == ""){
+        return alert("You must name your package");
       }
-      var toWrite = '';
-
-      //Generate Pak Args for mesh assets
-      var cookedAssets = $('#CookedAssets')[0].files;
-      for(var i=0;i<cookedAssets.length;i++){
-        var sourceDir = "\"" + cookedAssets[i].path + "\"";
-        var mountPoint = "\"" + "../../../Genesys/Content/Downloads/" + cookedAssets[i].name + "\"";
-        toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
+      if($('#CookedAssets')[0].files.length == 0){
+        return alert("You must select at least one cooked asset");
       }
 
-      //Generate Pak Args for mesh materials
-      var cookedMaterials = $('#CookedMaterials')[0].files;
-      for(var i=0;i<cookedMaterials.length;i++){
-        var sourceDir = "\"" + cookedMaterials[i].path + "\"";
-        var mountPoint = "\"" + "../../../Genesys/Content/Downloads/Materials/" + cookedMaterials[i].name + "\"";
-        toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
-      }
-
-      fs.write(fd,toWrite,function(err,written,string){
+      var fs = require('fs');
+      //Create temporary file to hold UnrealPak args
+      fs.open('./tmp/pakArgs.txt','w',function(err,fd){
         if(err){
           return alert(err);
         }
+        var toWrite = '';
 
-        fs.close(fd,function(){
-          var path = require('path');
-          var pakArgsDir = path.resolve('./tmp','pakArgs.txt');
-          var saveDir = path.resolve('./') + "\\" + $('#PakFileName').val() + ".pak";
+        //Generate Pak Args for mesh assets
+        var cookedAssets = $('#CookedAssets')[0].files;
+        for(var i=0;i<cookedAssets.length;i++){
+          var sourceDir = "\"" + cookedAssets[i].path + "\"";
+          var mountPoint = "\"" + "../../../Genesys/Content/Downloads/" + cookedAssets[i].name + "\"";
+          toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
+        }
 
-          var unrealPakDir = "\"" + path.resolve(localStorage.UEBinDir,"UnrealPak.exe") + "\"";
-          //Pak Args creation success, call UnrealPak.exe
-          var exec = require('child_process').exec;
-          var cmd = unrealPakDir  + " " + saveDir + " -Create=" + pakArgsDir;
-          exec(cmd, function(err, stdout, stderr) {
-            if(err){
-              console.log(err);
-              return alert(err);
-            }
-            else{
-              alert("Packaging Success: " + saveDir);
-            }
+        //Generate Pak Args for mesh materials
+        var cookedMaterials = $('#CookedMaterials')[0].files;
+        for(var i=0;i<cookedMaterials.length;i++){
+          var sourceDir = "\"" + cookedMaterials[i].path + "\"";
+          var mountPoint = "\"" + "../../../Genesys/Content/Downloads/Materials/" + cookedMaterials[i].name + "\"";
+          toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
+        }
+
+        fs.write(fd,toWrite,function(err,written,string){
+          if(err){
+            return alert(err);
+          }
+
+          fs.close(fd,function(){
+            var path = require('path');
+            var pakArgsDir = path.resolve('./tmp','pakArgs.txt');
+            var saveDir = path.resolve('./') + "\\" + $('#PakFileName').val() + ".pak";
+
+            var unrealPakDir = "\"" + path.resolve(localStorage.UEBinDir,"UnrealPak.exe") + "\"";
+            //Pak Args creation success, call UnrealPak.exe
+            var exec = require('child_process').exec;
+            var cmd = unrealPakDir  + " " + saveDir + " -Create=" + pakArgsDir;
+            exec(cmd, function(err, stdout, stderr) {
+              if(err){
+                console.log(err);
+                return alert(err);
+              }
+              else{
+                alert("Packaging Success: " + saveDir);
+              }
+            });
           });
+
         });
 
       });
-
     });
+
+
   });
 
 
-});
-
-
-</script>
+  </script>
 </body>
 </html>

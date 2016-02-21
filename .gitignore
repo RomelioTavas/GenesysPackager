@@ -1,2 +1,3 @@
 *.pak
 tmp/pakArgs.txt
+node_modules
