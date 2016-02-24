@@ -28,6 +28,8 @@
               </div>
           </div>
         </div>
+        <div id="cmd_out" class="one column centered row">
+        </div>
       </div>
     </div>
 
@@ -65,8 +67,10 @@
             }
             var toWrite = '';
 
+            var cookedPath = projectDir + "\\Saved\\Cooked\\WindowsNoEditor\\" + projectName + "\\Content\\" + projectName;
+
             //Generate Pak Args for mesh assets
-            var cookedMeshesPath = projectDir + "\\Content\\" + projectName + "\\Meshes";
+            var cookedMeshesPath = cookedPath + "\\Meshes";
             console.log("Cooked Meshes Path: " + cookedMeshesPath);
             var cookedAssets = fs.readdirSync(cookedMeshesPath);
             for(var i=0;i<cookedAssets.length;i++){
@@ -77,17 +81,17 @@
             }
 
             //Generate Pak Args for mesh materials
-            var cookedMaterialsPath = projectDir + "\\Content\\" + projectName + "\\Materials";
+            var cookedMaterialsPath = cookedPath + "\\Materials";
             console.log("Cooked Materials Path: " + cookedMaterialsPath);
             var cookedMaterials = fs.readdirSync(cookedMaterialsPath);
             for(var i=0;i<cookedMaterials.length;i++){
-              var sourceDir = "\"" + cookedMaterials + "\\" + cookedMaterials[i] + "\"";
+              var sourceDir = "\"" + cookedMaterialsPath + "\\" + cookedMaterials[i] + "\"";
               var mountPoint = "\"" + "../../../Genesys/Content/" + projectName + "/Materials/" + cookedMaterials[i] + "\"";
               toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
             }
 
             //Generate Pak Args for mesh textures
-            var cookedTexturesPath = projectDir + "\\Content\\" + projectName + "\\Textures";
+            var cookedTexturesPath = cookedPath + "\\Textures";
             console.log("Cooked Textures Path: "+ cookedTexturesPath);
             var cookedTextures = fs.readdirSync(cookedTexturesPath);
             for(var i=0;i<cookedTextures.length;i++){
@@ -110,7 +114,7 @@
                 var unrealPakDir = "\"" + path.resolve(localStorage.UEBinDir,"UnrealPak.exe") + "\"";
                 //Pak Args creation success, call UnrealPak.exe
                 var exec = require('child_process').exec;
-                var cmd = unrealPakDir  + " " + saveDir + " -Create=" + pakArgsDir + " -compress";
+                var cmd = unrealPakDir  + " " + saveDir + " -Create=" + pakArgsDir;
                 exec(cmd, function(err, stdout, stderr) {
                   if(err){
                     console.log(err);
