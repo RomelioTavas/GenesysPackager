@@ -2,6 +2,7 @@
   <head>
     <script src='./js/vendor/jquery-2.2.0.min.js'></script>
     <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+      <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="semantic/dist/semantic.min.js"></script>
   </head>
   <body>
@@ -14,7 +15,7 @@
           <div class="ui inverted segment">
               <div class="ui inverted form">
                 <div class="field">
-                  <label>Select your Unreal Engine Binaries Directory</label>
+                  <label id="BinLbl">Select your Unreal Engine Binaries Directory</label>
                   <p id="CurrBinDir">Current Bin Directory: </p>
                   <input type="file" id="UEBinDir" nwdirectory/>
                 </div>
@@ -24,6 +25,10 @@
                   <input type="file" id="ContentProject" nwdirectory/>
                 </div>
                 <br/>
+                <div class ="field">
+                  <label> Select output directory</label>
+                  <input type="file" id="OutputDir" nwdirectory/>
+                </div>
                 <input type="button" class="ui button teal" id="Package" value="Package"/>
               </div>
           </div>
@@ -31,13 +36,21 @@
         <div id="cmd_out" class="one column centered row">
         </div>
       </div>
+      <div id="CmdOutput" class="ui inverted segment"></div>
     </div>
 
     <script src="js/vendor/jquery.min.js"></script>
     <script>
+      function log(str){
+        $("#CmdOutput").append("<p>"+str+"</p>");
+      }
       $(document).ready(function () {
         $("#CurrBinDir").append(localStorage.UEBinDir);
-        $("#UEBinDir")[0].nwworkingdir = localStorage.UEBinDir;
+        if(localStorage.UEBinDir != undefined){
+            $("#UEBinDir").hide();
+            $("#BinLbl").hide()
+            $("#UEBinDir")[0].nwworkingdir = localStorage.UEBinDir;
+        }
 
         $("#UEBinDir").on("change",function(){
           localStorage.UEBinDir = this.value;
@@ -45,19 +58,20 @@
 
         $("#Package").on("click",function(){
 
-          //Validate input
-          if($('#PakFileName').val() == ""){
-            return alert("You must name your package");
+          //Validate Output Directory
+          var outputDir = $('#OutputDir').val();
+          if(outputDir == "" || outputDir == undefined ){
+            return alert("You must select an output directory");
           }
 
+          //Validate Project Directory
           var projectDir = $('#ContentProject')[0].value;
-
           if(projectDir == '' || projectDir == undefined){
             return alert("You must select your content project");
           }
 
           var projectName = projectDir.split("\\").slice(-1)[0];
-          console.log(projectName);
+          log(projectName);
 
           var fs = require('fs');
           //Create temporary file to hold UnrealPak args
@@ -70,11 +84,12 @@
             var cookedPath = projectDir + "\\Saved\\Cooked\\WindowsNoEditor\\" + projectName + "\\Content\\" + projectName;
 
             //Generate Pak Args for mesh assets
+
             var cookedMeshesPath = cookedPath + "\\Meshes";
-            console.log("Cooked Meshes Path: " + cookedMeshesPath);
             var cookedAssets = fs.readdirSync(cookedMeshesPath);
+
             for(var i=0;i<cookedAssets.length;i++){
-              console.log("Processing: " + cookedAssets[i]);
+              log("Processing: " + cookedAssets[i]);
               var sourceDir = "\"" + cookedMeshesPath + "\\" + cookedAssets[i] + "\"";
               var mountPoint = "\"" + "../../../Genesys/Content/" + projectName + "/Meshes/" + cookedAssets[i] + "\"";
               toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
@@ -85,7 +100,9 @@
             console.log("Cooked Materials Path: " + cookedMaterialsPath);
             var cookedMaterials = fs.readdirSync(cookedMaterialsPath);
             for(var i=0;i<cookedMaterials.length;i++){
+
               var sourceDir = "\"" + cookedMaterialsPath + "\\" + cookedMaterials[i] + "\"";
+              log("Processing: " + cookedMaterials[i]);
               var mountPoint = "\"" + "../../../Genesys/Content/" + projectName + "/Materials/" + cookedMaterials[i] + "\"";
               toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
             }
@@ -95,6 +112,7 @@
             console.log("Cooked Textures Path: "+ cookedTexturesPath);
             var cookedTextures = fs.readdirSync(cookedTexturesPath);
             for(var i=0;i<cookedTextures.length;i++){
+              log("Processing: " + cookedTextures[i]);
               var sourceDir = "\"" + cookedTexturesPath + "\\" + cookedTextures[i] + "\"";
               var mountPoint = "\"" + "../../../Genesys/Content/" + projectName + "/Textures/" + cookedTextures[i] + "\"";
               toWrite = toWrite + sourceDir + " " + mountPoint + "\r\n";
@@ -109,18 +127,19 @@
               fs.close(fd,function(){
                 var path = require('path');
                 var pakArgsDir = path.resolve('./tmp','pakArgs.txt');
-                var saveDir = path.resolve('./') + "\\" + projectName + ".pak";
-
+                var saveDir = outputDir + "\\" + projectName + ".pak";
+                log("Running UnrealPak.exe");
                 var unrealPakDir = "\"" + path.resolve(localStorage.UEBinDir,"UnrealPak.exe") + "\"";
                 //Pak Args creation success, call UnrealPak.exe
                 var exec = require('child_process').exec;
                 var cmd = unrealPakDir  + " " + saveDir + " -Create=" + pakArgsDir;
                 exec(cmd, function(err, stdout, stderr) {
                   if(err){
-                    console.log(err);
+                    log(err);
                     return alert(err);
                   }
                   else{
+                    log("Packaging Success: " + saveDir);
                     alert("Packaging Success: " + saveDir);
                   }
                 });
