@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "nw-builder": "^2.2.0",
     "semantic": "0.0.1",
     "semantic-ui": "^2.1.8"
   },
