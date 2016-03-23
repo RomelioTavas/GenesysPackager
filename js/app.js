@@ -36,7 +36,7 @@ function processStaticMesh(cookedPath,projectName){
 
   var meshArgs = generatePakArguments(cookedPath,projectName,"Meshes");
   if(!meshArgs){
-    alert("Cannot find Cooked Static Meshes. Packaging Failed");
+    alert("Cannot find Cooked Static Meshes. Cook your project first. Packaging Failed");
     return exit();
   }
 
@@ -57,7 +57,7 @@ function processSkeletalMesh(cookedPath,projectName){
   log("Processing Skeletal Meshes");
   var skelMeshArgs = generatePakArguments(cookedPath,projectName,"SkeletalMeshes");
   if(!skelMeshArgs){
-    alert("Cannot find Cooked Skeletal Meshes. Packaging Failed");
+    alert("Cannot find Cooked Skeletal Meshes. Cook your project first. Packaging Failed");
     return exit();
   }
   toWrite = toWrite + skelMeshArgs;
@@ -73,6 +73,20 @@ function processSkeletalMesh(cookedPath,projectName){
 
   log("Processing Skeletons");
   toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Skeletons");
+
+  return toWrite;
+}
+
+function processAudioAsset(cookedPath,projectName){
+  var toWrite = '';
+
+  log("Processing Audio Assets");
+  var audioArgs = generatePakArguments(cookedPath,projectName,"Audio");
+  if(!audioArgs){
+    alert("Cannot find Cooked Audio Assets. Cook your project first. Packaging Failed");
+    return exit();
+  }
+  toWrite = toWrite + audioArgs;
 
   return toWrite;
 }
@@ -132,10 +146,12 @@ $(document).ready(function () {
       }
       else if(packageType == "soundAsset"){
 
+        toWrite = processAudioAsset(cookedPath,projectName);
 
       }
       else{
         alert("Please select Package Type");
+        exit();
       }
 
 
