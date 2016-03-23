@@ -10,7 +10,7 @@
   "version": "1.0",
   "window": {
     "title": "Genesys Packager",
-    "toolbar": false,
+    "toolbar": true,
     "frame": true,
     "width": 470,
     "height": 400
