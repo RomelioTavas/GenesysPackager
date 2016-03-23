@@ -33,7 +33,14 @@ function processStaticMesh(cookedPath,projectName){
   var toWrite = '';
 
   log("Processing Mesh Assets");
-  toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Meshes");
+
+  var meshArgs = generatePakArguments(cookedPath,projectName,"Meshes");
+  if(!meshArgs){
+    alert("Cannot find Cooked Static Meshes. Packaging Failed");
+    return exit();
+  }
+
+  toWrite = toWrite + meshArgs;
 
   log("Processing Materials");
   toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Materials");
@@ -41,7 +48,32 @@ function processStaticMesh(cookedPath,projectName){
   log("Processing Textures");
   toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Textures");
 
-  console.log("write"+toWrite);
+  return toWrite;
+}
+
+function processSkeletalMesh(cookedPath,projectName){
+  var toWrite = '';
+
+  log("Processing Skeletal Meshes");
+  var skelMeshArgs = generatePakArguments(cookedPath,projectName,"SkeletalMeshes");
+  if(!skelMeshArgs){
+    alert("Cannot find Cooked Skeletal Meshes. Packaging Failed");
+    return exit();
+  }
+  toWrite = toWrite + skelMeshArgs;
+
+  log("Processing Materials");
+  toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Materials");
+
+  log("Processing Textures");
+  toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Textures");
+
+  log("Processing Animations");
+  toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Animations");
+
+  log("Processing Skeletons");
+  toWrite = toWrite + generatePakArguments(cookedPath,projectName,"Skeletons");
+
   return toWrite;
 }
 
@@ -85,7 +117,28 @@ $(document).ready(function () {
         return alert(err);
       }
       var cookedPath = projectDir + "\\Saved\\Cooked\\WindowsNoEditor\\" + projectName + "\\Content\\" + projectName;
-      var toWrite = processStaticMesh(cookedPath,projectName);
+
+      var toWrite;
+
+      if(packageType == "staticMesh"){
+
+        toWrite = processStaticMesh(cookedPath,projectName);
+
+      }
+      else if(packageType == "skeletalMesh"){
+
+        toWrite = processSkeletalMesh(cookedPath,projectName);
+
+      }
+      else if(packageType == "soundAsset"){
+
+
+      }
+      else{
+        alert("Please select Package Type");
+      }
+
+
 
       //Write Unreal Pak Args
       fs.write(fd,toWrite,function(err,written,string){
