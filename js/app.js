@@ -1,6 +1,6 @@
 
 function log(str){
-  $("#CmdOutput").append("<p>"+str+"</p>");
+  //$("#CmdOutput").append("<p>"+str+"</p>");
 }
 
 
@@ -29,6 +29,33 @@ function generatePakArguments(cookedPath,projectName,assetType){
   return argContainer;
 }
 
+function generateAssetHash(cookedPath,projectName,assetType){
+  var fs = require('fs');
+
+  var argContainer = '';
+  //Generate Pak Args for mesh assets
+  var cookedAssetPath = cookedPath + "\\" + assetType;
+  var cookedAssets;
+
+  try {
+    cookedAssets = fs.readdirSync(cookedAssetPath);
+  }
+  catch (e) {
+    log(e);
+    return;
+  }
+
+  for(var i=0;i<cookedAssets.length;i++){
+    var objectPath =  "/Game/" + projectName + "/"+ assetType +"/" + cookedAssets[i] + "." + cookedAssets[i];
+    argContainer = argContainer + objectPath;
+  }
+  const crypto = require('crypto');
+
+  var sha256Hash = crypto.createHmac('sha1',argContainer).digest('hex');
+
+  return sha256Hash;
+}
+
 function processStaticMesh(cookedPath,projectName){
   var toWrite = '';
 
@@ -37,7 +64,7 @@ function processStaticMesh(cookedPath,projectName){
   var meshArgs = generatePakArguments(cookedPath,projectName,"Meshes");
   if(!meshArgs){
     alert("Cannot find Cooked Static Meshes. Cook your project first. Packaging Failed");
-    return exit();
+    return null;
   }
 
   toWrite = toWrite + meshArgs;
@@ -58,7 +85,7 @@ function processSkeletalMesh(cookedPath,projectName){
   var skelMeshArgs = generatePakArguments(cookedPath,projectName,"SkeletalMeshes");
   if(!skelMeshArgs){
     alert("Cannot find Cooked Skeletal Meshes. Cook your project first. Packaging Failed");
-    return exit();
+    return null;
   }
   toWrite = toWrite + skelMeshArgs;
 
@@ -84,7 +111,7 @@ function processAudioAsset(cookedPath,projectName){
   var audioArgs = generatePakArguments(cookedPath,projectName,"Audio");
   if(!audioArgs){
     alert("Cannot find Cooked Audio Assets. Cook your project first. Packaging Failed");
-    return exit();
+    return null;
   }
   toWrite = toWrite + audioArgs;
 
@@ -94,13 +121,17 @@ function processAudioAsset(cookedPath,projectName){
 $(document).ready(function () {
   $("#CurrBinDir").append(localStorage.UEBinDir);
   if(localStorage.UEBinDir != undefined){
-      $("#UEBinDir").hide();
+      //$("#UEBinDir").hide();
       $("#BinLbl").hide()
       $("#UEBinDir")[0].nwworkingdir = localStorage.UEBinDir;
   }
 
   $("#UEBinDir").on("change",function(){
     localStorage.UEBinDir = this.value;
+  });
+
+  $('#ContentProject').on("change",function(){
+    $('#ContentProject')[0].nwworkingdir = this.value;
   });
 
   $("#Package").on("click",function(){
@@ -133,28 +164,29 @@ $(document).ready(function () {
       var cookedPath = projectDir + "\\Saved\\Cooked\\WindowsNoEditor\\" + projectName + "\\Content\\" + projectName;
 
       var toWrite;
+      var hash;
 
       if(packageType == "staticMesh"){
 
         toWrite = processStaticMesh(cookedPath,projectName);
-
+        hash = generateAssetHash(cookedPath,projectName,"Meshes");
       }
       else if(packageType == "skeletalMesh"){
 
         toWrite = processSkeletalMesh(cookedPath,projectName);
-
+        hash = generateAssetHash(cookedPath,projectName,"SkeletalMeshes");
       }
       else if(packageType == "soundAsset"){
 
         toWrite = processAudioAsset(cookedPath,projectName);
-
+        hash = generateAssetHash(cookedPath,projectName,"Audio");
       }
       else{
         alert("Please select Package Type");
-        exit();
+        return;
       }
 
-
+      if(toWrite == null){ return; }
 
       //Write Unreal Pak Args
       fs.write(fd,toWrite,function(err,written,string){
@@ -165,7 +197,7 @@ $(document).ready(function () {
         fs.close(fd,function(){
           var path = require('path');
           var pakArgsDir = path.resolve('./tmp','pakArgs.txt');
-          var saveDir = outputDir + "\\" + projectName + ".pak";
+          var saveDir = outputDir + "\\" + projectName + "_" +  hash + ".pak";
 
           log("Running UnrealPak.exe");
           var unrealPakDir = "\"" + path.resolve(localStorage.UEBinDir,"UnrealPak.exe") + "\"";
