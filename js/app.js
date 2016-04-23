@@ -46,14 +46,17 @@ function generateAssetHash(cookedPath,projectName,assetType){
   }
 
   for(var i=0;i<cookedAssets.length;i++){
-    var objectPath =  "/Game/" + projectName + "/"+ assetType +"/" + cookedAssets[i] + "." + cookedAssets[i];
+    var objectName = cookedAssets[i].replace(".uasset","");
+
+    var objectPath =  "/Game/" + projectName + "/"+ assetType +"/" + objectName + "." + objectName;
+
     argContainer = argContainer + objectPath;
   }
+  console.log(argContainer);
   const crypto = require('crypto');
-
-  var sha256Hash = crypto.createHmac('sha1',argContainer).digest('hex');
-
-  return sha256Hash;
+  var sha_sum = crypto.createHash('sha1');
+  sha_sum.update(argContainer);
+  return sha_sum.digest('hex');
 }
 
 function processStaticMesh(cookedPath,projectName){
