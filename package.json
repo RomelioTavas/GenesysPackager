@@ -12,8 +12,7 @@
     "title": "Genesys Packager",
     "toolbar": true,
     "frame": true,
-    "width": 470,
-    "height": 400
+    "fullscreen":true
   },
   "webkit": {
     "plugin": true

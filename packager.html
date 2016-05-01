@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <script src='./js/vendor/jquery-2.2.0.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="semantic/dist/semantic.min.js"></script>
+  </head>
+  <body>
+    <div class ="ui inverted segment">
+      <div class="ui grid">
+        <div class="one column centered row teal">
+                <h1>Genesys Packager</h1>
+        </div>
+        <div class="one column centered row">
+          <div class="ui inverted segment">
+              <div class="ui inverted form">
+                <div class="field">
+                  <label id="BinLbl">Select your Unreal Engine Binaries Directory</label>
+                  <p id="CurrBinDir">Current Bin Directory: </p>
+                  <input type="file" id="UEBinDir" nwdirectory/>
+                </div>
+                <br/>
+                <div class ="field">
+                  <label> Select Asset Type</label>
+                  <select id="PackageType">
+                    <option value="staticMesh">Static Mesh</option>
+                    <option value="skeletalMesh">Animated Skeletal Mesh</option>
+                    <option value="soundAsset">Sound Asset</option>
+                  </select>
+                </div>
+                <div class ="field">
+                  <label> Select your content project</label>
+                  <input type="file" id="ContentProject" nwdirectory/>
+                </div>
+                <br/>
+                <div class ="field">
+                  <label> Select output directory</label>
+                  <input type="file" id="OutputDir" nwdirectory/>
+                </div>
+                <input type="button" class="ui button teal" id="Package" value="Package"/>
+              </div>
+          </div>
+        </div>
+        <div id="cmd_out" class="one column centered row">
+        </div>
+      </div>
+      <div id="CmdOutput" class="ui inverted segment"></div>
+    </div>
+
+    <script src="js/vendor/jquery.min.js"></script>
+    <script src="js/app.js"></script>
+
+  </body>
+</html>
