@@ -8,18 +8,18 @@ Packages Unreal Engine's Cooked Assets for the Genesys Platform
 3. In the Content Browser, under the Content folder, create a folder named after your project name.
 4. Under the folder you created in step 3, create the following folders
  - For Static Meshes
-  - Meshes
-  - Materials
-  - Textures
+     - Meshes
+     - Materials
+     - Textures
  - For Skeletal Meshes
-  - SkeletalMeshes
-  - Animations - We only support Animation Sequences for now
-  - Materials
-  - Textures
-  - PhysicsAssets
-  - Skeletons
+     - SkeletalMeshes
+     - Animations - We only support Animation Sequences for now
+     - Materials
+     - Textures
+     - PhysicsAssets
+     - Skeletons
  - For Sound Assets
-  - Audio - WAV files go here
+     - Audio - WAV files go here
 
 5. Import an FBX file by either dragging it to the content browser or by using the right-click context menu.
 6. Move each file to its appropriate directory.
