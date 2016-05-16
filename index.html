@@ -15,14 +15,17 @@
           <div class="ui inverted segment">
               <div class="ui inverted form">
                 <div class="field">
-                  <label id="BinLbl">Select your Unreal Engine Binaries Directory</label>
-                  <p id="CurrBinDir">Current Bin Directory: </p>
-                  <input type="file" id="UEBinDir" nwdirectory/>
+                  <label>Select your Unreal Engine Binaries Directory</label>
+                  <p id="CurrBinDir"></p>
+                  <input type="file" id="UEBinDir" nwdirectory/><br/>
+                  <button class="ui button teal" id="choose-uebindir">
+                      Change
+                  </button>
                 </div>
                 <br/>
                 <div class ="field">
                   <label> Select Asset Type</label>
-                  <select id="PackageType">
+                  <select class="ui dropdown" id="PackageType">
                     <option value="staticMesh">Static Mesh</option>
                     <option value="skeletalMesh">Animated Skeletal Mesh</option>
                     <option value="soundAsset">Sound Asset</option>
@@ -49,6 +52,11 @@
 
     <script src="js/vendor/jquery.min.js"></script>
     <script src="js/app.js"></script>
+    <script>
+      $("#choose-uebindir").unbind("click").bind("click",function(){
+        $("#UEBinDir").click();
+      })
 
+    </script>
   </body>
 </html>

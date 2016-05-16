@@ -122,15 +122,23 @@ function processAudioAsset(cookedPath,projectName){
 }
 
 $(document).ready(function () {
-  $("#CurrBinDir").append(localStorage.UEBinDir);
+
+
+  var fs = require('fs');
+  $("#CurrBinDir").html(localStorage.UEBinDir);
   if(localStorage.UEBinDir != undefined){
-      //$("#UEBinDir").hide();
-      $("#BinLbl").hide()
       $("#UEBinDir")[0].nwworkingdir = localStorage.UEBinDir;
+  }
+  else{
+      $("#CurrBinDir").html("Current Directory: None");
   }
 
   $("#UEBinDir").on("change",function(){
-    localStorage.UEBinDir = this.value;
+    if(this.value != ""){
+      localStorage.UEBinDir = this.value + "\\Engine\\Binaries\\Win64";
+      $("#CurrBinDir").html(localStorage.UEBinDir);
+    }
+
   });
 
   $('#ContentProject').on("change",function(){
@@ -159,7 +167,7 @@ $(document).ready(function () {
     log(projectName);
 
     //Create temporary file to hold UnrealPak args
-    var fs = require('fs');
+
     fs.open('./tmp/pakArgs.txt','w',function(err,fd){
       if(err){
         return alert(err);

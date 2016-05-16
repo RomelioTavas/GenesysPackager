@@ -10,10 +10,10 @@
   "version": "1.0",
   "window": {
     "title": "Genesys Packager",
-    "toolbar": true,
+    "toolbar": false,
     "frame": true,
-    "width": 470,
-    "height": 400
+    "width": 400,
+    "height": 600
   },
   "webkit": {
     "plugin": true
